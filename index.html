@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="无界像集：持续更新的原创视觉壁纸图库，涵盖自然、宇宙、未来科技与幻想世界。" />
+    <meta name="theme-color" content="#11110f" />
+    <title>无界像集 | 原创视觉壁纸图库</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="返回顶部">
+        <span class="brand-mark">W</span>
+        <span>无界像集</span>
+      </a>
+      <nav aria-label="主要导航">
+        <a href="#gallery">图库</a>
+        <a href="#license">授权</a>
+        <button class="icon-button" id="themeToggle" type="button" aria-label="切换明暗主题" title="切换主题">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.5 0-1-.1-1.5A7 7 0 0 1 13.5 3H12Z"/></svg>
+        </button>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <img id="heroImage" src="" alt="精选壁纸" />
+        <div class="hero-shade"></div>
+        <div class="hero-copy">
+          <p class="eyebrow">WUJIE VISUAL ARCHIVE · 2026</p>
+          <h1 id="hero-title">无界像集</h1>
+          <p>为屏幕收藏另一种世界。原创视觉壁纸，持续更新。</p>
+          <a class="primary-button" href="#gallery">进入图库 <span aria-hidden="true">↓</span></a>
+        </div>
+        <div class="hero-meta"><span id="heroCategory">每日精选</span><span id="artCount">正在整理作品</span></div>
+      </section>
+
+      <section class="gallery-section" id="gallery">
+        <div class="section-heading">
+          <div><p class="eyebrow">THE ARCHIVE</p><h2>探索作品</h2></div>
+          <p id="resultCount" aria-live="polite"></p>
+        </div>
+
+        <div class="toolbar">
+          <label class="search-box">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+            <input id="searchInput" type="search" placeholder="搜索主题、场景或关键词" autocomplete="off" />
+          </label>
+          <div class="segmented" role="group" aria-label="画面方向">
+            <button class="active" type="button" data-orientation="全部">全部</button>
+            <button type="button" data-orientation="横屏">横屏</button>
+            <button type="button" data-orientation="竖屏">竖屏</button>
+          </div>
+        </div>
+        <div class="category-list" id="categoryList" aria-label="主题筛选"></div>
+        <div class="gallery-grid" id="galleryGrid" aria-live="polite"></div>
+        <div class="empty-state" id="emptyState" hidden><strong>没有找到对应作品</strong><span>试试其他关键词或分类</span></div>
+        <button class="load-more" id="loadMore" type="button">加载更多作品</button>
+      </section>
+
+      <section class="collection-band" id="license">
+        <div>
+          <p class="eyebrow">WEEKLY DROP</p>
+          <h2>每周精选，不错过新世界</h2>
+          <p>公开图库可免费下载预览版。关注小红书并私信“图库”，获取当周高清精选包与更新通知。</p>
+        </div>
+        <button class="primary-button light" type="button" data-open-contact>获取高清精选</button>
+      </section>
+
+      <section class="license-section">
+        <div class="section-heading"><div><p class="eyebrow">LICENSE</p><h2>使用与授权</h2></div></div>
+        <div class="license-grid">
+          <article><span>01</span><h3>个人使用</h3><p>可用于个人手机、电脑壁纸。请勿二次售卖、打包分发或冒充原创。</p><strong>预览版免费</strong></article>
+          <article><span>02</span><h3>高清收藏</h3><p>无水印高清原图与主题合集，适合多设备收藏。首批合集正在整理。</p><strong>即将开放</strong></article>
+          <article><span>03</span><h3>商业授权</h3><p>用于自媒体配图、封面、空间展示或品牌项目，请按用途单独询价。</p><button type="button" data-open-contact>咨询授权 →</button></article>
+        </div>
+      </section>
+    </main>
+
+    <footer><div class="brand"><span class="brand-mark">W</span><span>无界像集</span></div><p>作品持续生长，边界留给想象。</p><span>© 2026 WUJIE ARCHIVE</span></footer>
+
+    <dialog id="artDialog" class="art-dialog">
+      <button class="dialog-close icon-button" type="button" data-close-dialog aria-label="关闭预览" title="关闭">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+      <div class="dialog-media"><img id="dialogImage" src="" alt="" /></div>
+      <div class="dialog-info">
+        <p class="eyebrow" id="dialogCategory"></p><h2 id="dialogTitle"></h2><p id="dialogKeywords"></p>
+        <dl><div><dt>画幅</dt><dd id="dialogOrientation"></dd></div><div><dt>原始尺寸</dt><dd id="dialogSize"></dd></div><div><dt>创作日期</dt><dd id="dialogDate"></dd></div></dl>
+        <div class="dialog-actions"><a class="primary-button" id="downloadPreview" href="" download>下载预览图</a><button type="button" data-open-contact>获取高清原图</button></div>
+        <small>预览图仅限个人壁纸使用，商业使用请先取得授权。</small>
+      </div>
+    </dialog>
+
+    <dialog id="contactDialog" class="contact-dialog">
+      <button class="dialog-close icon-button" type="button" data-close-contact aria-label="关闭" title="关闭">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+      <p class="eyebrow">GET IN TOUCH</p><h2>获取高清图与授权</h2>
+      <p>请在小红书私信发送关键词 <strong>“图库”</strong>。需要商业使用时，请同时说明使用场景、渠道和预计周期。</p>
+      <div class="contact-note"><span>私信模板</span><button id="copyTemplate" type="button">复制</button><p id="templateText">你好，我从无界像集网站来，想获取高清精选包。用途：个人壁纸。</p></div>
+      <button class="primary-button" id="xiaohongshuButton" type="button">前往小红书主页</button>
+      <small>在 <code>app.js</code> 中填写主页链接后，此按钮会直接跳转。</small>
+    </dialog>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
