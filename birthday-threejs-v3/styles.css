@@ -1,0 +1,112 @@
+:root {
+  color-scheme: dark;
+  font-family:
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  background: #01020a;
+  color: #eafaff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  min-height: 100svh;
+  touch-action: none;
+  user-select: none;
+}
+
+#app {
+  position: relative;
+  background:
+    radial-gradient(circle at 50% 82%, rgba(74, 48, 185, 0.16), transparent 18rem),
+    radial-gradient(circle at 50% 42%, rgba(19, 82, 130, 0.1), transparent 24rem),
+    #01020a;
+}
+
+#stage {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.viewer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0);
+  transition: opacity 220ms ease, background 220ms ease;
+  backdrop-filter: blur(0);
+}
+
+.viewer.open {
+  opacity: 1;
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.76);
+  backdrop-filter: blur(10px);
+}
+
+#viewerImage {
+  width: min(78vw, 520px);
+  max-height: 82svh;
+  object-fit: contain;
+  border: 1px solid rgba(117, 239, 255, 0.72);
+  border-radius: 12px;
+  box-shadow: 0 0 26px rgba(69, 229, 255, 0.28), 0 0 82px rgba(99, 91, 255, 0.2);
+}
+
+.viewer-close {
+  position: absolute;
+  top: max(20px, env(safe-area-inset-top));
+  right: clamp(18px, 5vw, 48px);
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(177, 241, 255, 0.34);
+  border-radius: 50%;
+  color: rgba(235, 252, 255, 0.9);
+  background: rgba(6, 10, 25, 0.78);
+  font: 900 1.45rem/1 system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.loading {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 6;
+  transform: translate(-50%, -50%);
+  color: rgba(223, 250, 255, 0.9);
+  font-weight: 900;
+  text-shadow: 0 0 18px rgba(104, 223, 255, 0.58);
+  transition: opacity 320ms ease;
+}
+
+.loading.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.lil-gui {
+  --background-color: rgba(4, 7, 17, 0.9);
+  --text-color: #eafaff;
+  --title-background-color: rgba(11, 18, 39, 0.95);
+  --widget-color: rgba(20, 35, 72, 0.9);
+  --focus-color: #7fe8ff;
+  --number-color: #d8faff;
+  backdrop-filter: blur(14px);
+}

@@ -1,0 +1,142 @@
+[
+  {
+    "id": "photo-01",
+    "title": "Memory 01",
+    "original": "assets/user-photos/originals/photo-01.jpg",
+    "optimized": "assets/user-photos/optimized/photo-01.jpg",
+    "thumb": "assets/user-photos/thumbs/photo-01.jpg",
+    "width": 1784,
+    "height": 2316,
+    "aspect": 0.7703
+  },
+  {
+    "id": "photo-02",
+    "title": "Memory 02",
+    "original": "assets/user-photos/originals/photo-02.png",
+    "optimized": "assets/user-photos/optimized/photo-02.jpg",
+    "thumb": "assets/user-photos/thumbs/photo-02.jpg",
+    "width": 1773,
+    "height": 2364,
+    "aspect": 0.75
+  },
+  {
+    "id": "photo-03",
+    "title": "Memory 03",
+    "original": "assets/user-photos/originals/photo-03.jpg",
+    "optimized": "assets/user-photos/optimized/photo-03.jpg",
+    "thumb": "assets/user-photos/thumbs/photo-03.jpg",
+    "width": 1279,
+    "height": 1706,
+    "aspect": 0.7497
+  },
+  {
+    "id": "photo-04",
+    "title": "Memory 04",
+    "original": "assets/user-photos/originals/photo-04.jpg",
+    "optimized": "assets/user-photos/optimized/photo-04.jpg",
+    "thumb": "assets/user-photos/thumbs/photo-04.jpg",
+    "width": 3535,
+    "height": 5184,
+    "aspect": 0.6819
+  },
+  {
+    "id": "photo-05",
+    "title": "Memory 05",
+    "original": "assets/user-photos/originals/photo-05.jpg",
+    "optimized": "assets/user-photos/optimized/photo-05.jpg",
+    "thumb": "assets/user-photos/thumbs/photo-05.jpg",
+    "width": 1080,
+    "height": 1440,
+    "aspect": 0.75
+  },
+  {
+    "id": "photo-06",
+    "title": "Memory 06",
+    "original": "assets/user-photos/originals/photo-06.jpg",
+    "optimized": "assets/user-photos/optimized/photo-06.jpg",
+    "thumb": "assets/user-photos/thumbs/photo-06.jpg",
+    "width": 1080,
+    "height": 1440,
+    "aspect": 0.75
+  },
+  {
+    "id": "photo-07",
+    "title": "Memory 07",
+    "original": "assets/user-photos/originals/photo-07.jpg",
+    "optimized": "assets/user-photos/optimized/photo-07.jpg",
+    "thumb": "assets/user-photos/thumbs/photo-07.jpg",
+    "width": 1080,
+    "height": 1888,
+    "aspect": 0.572
+  },
+  {
+    "id": "photo-08",
+    "title": "Memory 08",
+    "original": "assets/user-photos/originals/photo-08.jpg",
+    "optimized": "assets/user-photos/optimized/photo-08.jpg",
+    "thumb": "assets/user-photos/thumbs/photo-08.jpg",
+    "width": 720,
+    "height": 1280,
+    "aspect": 0.5625
+  },
+  {
+    "id": "photo-09",
+    "title": "Memory 09",
+    "original": "assets/user-photos/originals/photo-09.jpg",
+    "optimized": "assets/user-photos/optimized/photo-09.jpg",
+    "thumb": "assets/user-photos/thumbs/photo-09.jpg",
+    "width": 1152,
+    "height": 2560,
+    "aspect": 0.45
+  },
+  {
+    "id": "photo-10",
+    "title": "Memory 10",
+    "original": "assets/user-photos/originals/photo-10.jpg",
+    "optimized": "assets/user-photos/optimized/photo-10.jpg",
+    "thumb": "assets/user-photos/thumbs/photo-10.jpg",
+    "width": 1080,
+    "height": 1920,
+    "aspect": 0.5625
+  },
+  {
+    "id": "photo-11",
+    "title": "Memory 11",
+    "original": "assets/user-photos/originals/photo-11.jpg",
+    "optimized": "assets/user-photos/optimized/photo-11.jpg",
+    "thumb": "assets/user-photos/thumbs/photo-11.jpg",
+    "width": 1220,
+    "height": 1627,
+    "aspect": 0.7498
+  },
+  {
+    "id": "photo-12",
+    "title": "Memory 12",
+    "original": "assets/user-photos/originals/photo-12.jpg",
+    "optimized": "assets/user-photos/optimized/photo-12.jpg",
+    "thumb": "assets/user-photos/thumbs/photo-12.jpg",
+    "width": 1080,
+    "height": 1920,
+    "aspect": 0.5625
+  },
+  {
+    "id": "photo-13",
+    "title": "Memory 13",
+    "original": "assets/user-photos/originals/photo-13.jpg",
+    "optimized": "assets/user-photos/optimized/photo-13.jpg",
+    "thumb": "assets/user-photos/thumbs/photo-13.jpg",
+    "width": 1220,
+    "height": 1627,
+    "aspect": 0.7498
+  },
+  {
+    "id": "photo-14",
+    "title": "Memory 14",
+    "original": "assets/user-photos/originals/photo-14.jpg",
+    "optimized": "assets/user-photos/optimized/photo-14.jpg",
+    "thumb": "assets/user-photos/thumbs/photo-14.jpg",
+    "width": 2560,
+    "height": 1152,
+    "aspect": 2.2222
+  }
+]
