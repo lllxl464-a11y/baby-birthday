@@ -76,6 +76,12 @@ let fireworkState;
 let portraitPoints;
 let portraitReady = false;
 let raycaster;
+let audioCtx;
+let masterGain;
+let musicGain;
+let sfxGain;
+let audioStarted = false;
+let musicLoopTimer;
 
 init();
 
@@ -295,6 +301,11 @@ function createPhotoCard(texture, photo) {
   const group = new THREE.Group();
   const h = 0.86;
   const w = 0.58;
+  const hitArea = new THREE.Mesh(
+    new THREE.PlaneGeometry(w + 0.34, h + 0.34),
+    new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+  );
+  hitArea.position.z = 0.03;
   const frame = new THREE.Mesh(
     new THREE.PlaneGeometry(w + 0.08, h + 0.08),
     new THREE.MeshBasicMaterial({ color: "#52e4f7", transparent: true, opacity: 0.18 })
@@ -309,8 +320,8 @@ function createPhotoCard(texture, photo) {
     new THREE.MeshBasicMaterial({ color: "#45e7ff", transparent: true, opacity: 0.014, blending: THREE.AdditiveBlending })
   );
   glow.position.z = -0.014;
-  group.add(glow, frame, image);
-  group.userData = { photo, image, frame, glow };
+  group.add(glow, frame, image, hitArea);
+  group.userData = { photo, image, frame, glow, hitArea };
   return group;
 }
 
@@ -497,6 +508,7 @@ async function buildPortraitLayer() {
 
 function setStage(stage, immediate = false) {
   if (stage === "finale" && !portraitReady) return;
+  const previousStage = currentStage;
   currentStage = stage;
   stageTime = 0;
   document.body.dataset.stage = stage;
@@ -511,6 +523,7 @@ function setStage(stage, immediate = false) {
   giftGroup.visible = ["gift", "count3", "count2", "count1"].includes(stage);
   if (portraitPoints) portraitPoints.visible = stage === "finale";
   if (stage === "fireworks") triggerFirework();
+  if (stage !== previousStage) playStageCue(stage);
   resizeMainParticles(stage);
 }
 
@@ -537,6 +550,8 @@ function triggerFirework() {
   firework.visible = true;
   fireworkState.exploded = false;
   fireworkState.age = 0;
+  playFireworkLaunch();
+  window.setTimeout(playFireworkBurst, FIREWORK_ASCEND * 1000);
   const pos = firework.geometry.attributes.position.array;
   const alpha = firework.geometry.attributes.alpha.array;
   for (let i = 0; i < fireworkState.count; i += 1) {
@@ -878,6 +893,7 @@ function setupEvents() {
     }
   }, { passive: true });
   window.addEventListener("pointerdown", (event) => {
+    ensureAudio();
     drag.active = true;
     drag.startX = event.clientX;
     drag.startY = event.clientY;
@@ -895,29 +911,39 @@ function onPointerUp(event) {
   const moved = drag.moved;
   drag.active = false;
   if (viewer.classList.contains("open")) return;
-  if (currentStage === "album" && moved < 8) {
-    const centerZone = Math.hypot(event.clientX - window.innerWidth / 2, event.clientY - window.innerHeight / 2) < Math.min(window.innerWidth, window.innerHeight) * 0.24;
+  if (currentStage === "album" && moved < 18) {
+    playClickSound();
+    const centerZone = Math.hypot(event.clientX - window.innerWidth / 2, event.clientY - window.innerHeight / 2) < Math.min(window.innerWidth, window.innerHeight) * 0.34;
     const hit = pickPhotoCard(event);
-    if ((hit && hit === centerCard || centerZone) && centerCard?.userData.photo) {
+    if (hit?.userData.photo) {
+      openViewer(hit.userData.photo.optimized);
+      return;
+    }
+    if (centerZone && centerCard?.userData.photo) {
       openViewer(centerCard.userData.photo.optimized);
       return;
     }
     advanceStage();
     return;
   }
-  if (moved < 10) advanceStage();
+  if (moved < 14) {
+    playClickSound();
+    advanceStage();
+  }
 }
 
 function pickPhotoCard(event) {
   pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
   pointer.y = -((event.clientY / window.innerHeight) * 2 - 1);
   raycaster.setFromCamera(pointer, camera);
-  const hits = raycaster.intersectObjects(photoCards.map((card) => card.userData.image), false);
+  const hitTargets = photoCards.map((card) => card.userData.hitArea || card.userData.image);
+  const hits = raycaster.intersectObjects(hitTargets, false);
   if (!hits.length) return null;
-  return photoCards.find((card) => card.userData.image === hits[0].object) || null;
+  return photoCards.find((card) => card.userData.hitArea === hits[0].object || card.userData.image === hits[0].object) || null;
 }
 
 function openViewer(src) {
+  playOpenSound();
   viewerImage.src = src;
   viewer.classList.add("open");
   viewer.setAttribute("aria-hidden", "false");
@@ -925,6 +951,7 @@ function openViewer(src) {
 
 function closeViewer(event) {
   event?.stopPropagation();
+  playCloseSound();
   viewer.classList.remove("open");
   viewer.setAttribute("aria-hidden", "true");
 }
@@ -1010,6 +1037,188 @@ function gaussian2(x, y, cx, cy, sx, sy) {
 
 function easeOutCubic(x) {
   return 1 - Math.pow(1 - THREE.MathUtils.clamp(x, 0, 1), 3);
+}
+
+function ensureAudio() {
+  if (audioStarted) {
+    if (audioCtx?.state === "suspended") audioCtx.resume();
+    return;
+  }
+  const AudioCtor = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtor) return;
+  audioCtx = new AudioCtor();
+  masterGain = audioCtx.createGain();
+  musicGain = audioCtx.createGain();
+  sfxGain = audioCtx.createGain();
+  masterGain.gain.value = 0.72;
+  musicGain.gain.value = 0.11;
+  sfxGain.gain.value = 0.34;
+  musicGain.connect(masterGain);
+  sfxGain.connect(masterGain);
+  masterGain.connect(audioCtx.destination);
+  audioStarted = true;
+  document.body.dataset.audio = "on";
+  startBackgroundMusic();
+}
+
+function startBackgroundMusic() {
+  if (!audioCtx || musicLoopTimer) return;
+  const melody = [
+    ["G4", 0.32], ["G4", 0.32], ["A4", 0.62], ["G4", 0.62], ["C5", 0.62], ["B4", 1.0],
+    ["G4", 0.32], ["G4", 0.32], ["A4", 0.62], ["G4", 0.62], ["D5", 0.62], ["C5", 1.0],
+    ["G4", 0.32], ["G4", 0.32], ["G5", 0.62], ["E5", 0.62], ["C5", 0.62], ["B4", 0.62], ["A4", 1.0],
+    ["F5", 0.32], ["F5", 0.32], ["E5", 0.62], ["C5", 0.62], ["D5", 0.62], ["C5", 1.28],
+  ];
+  const schedule = () => {
+    if (!audioCtx || !audioStarted) return;
+    let t = audioCtx.currentTime + 0.06;
+    melody.forEach(([note, duration], i) => {
+      const freq = noteFreq(note);
+      playTone(freq, t, duration * 0.92, {
+        type: i % 4 === 0 ? "triangle" : "sine",
+        gain: 0.06,
+        destination: musicGain,
+        attack: 0.035,
+        release: 0.34,
+      });
+      if (i % 2 === 0) {
+        playTone(freq / 2, t + 0.01, duration * 1.2, {
+          type: "sine",
+          gain: 0.024,
+          destination: musicGain,
+          attack: 0.05,
+          release: 0.48,
+        });
+      }
+      t += duration * 0.62;
+    });
+    const loopMs = Math.max(1000, (t - audioCtx.currentTime - 0.36) * 1000);
+    musicLoopTimer = window.setTimeout(() => {
+      musicLoopTimer = undefined;
+      schedule();
+    }, loopMs);
+  };
+  schedule();
+}
+
+function playStageCue(stage) {
+  if (!audioStarted) return;
+  if (stage === "count3" || stage === "count2" || stage === "count1") {
+    const freq = stage === "count3" ? 392 : stage === "count2" ? 523.25 : 659.25;
+    playTone(freq, audioCtx.currentTime, 0.22, { type: "sine", gain: 0.18, destination: sfxGain, attack: 0.006, release: 0.16 });
+    playTone(freq * 2.01, audioCtx.currentTime + 0.015, 0.18, { type: "triangle", gain: 0.065, destination: sfxGain, attack: 0.008, release: 0.14 });
+  } else if (stage === "cake" || stage === "album" || stage === "finale") {
+    playSparkle(stage === "finale" ? 1.2 : 0.78);
+  }
+}
+
+function playClickSound() {
+  if (!audioStarted) return;
+  const now = audioCtx.currentTime;
+  playTone(880, now, 0.07, { type: "sine", gain: 0.055, destination: sfxGain, attack: 0.003, release: 0.055 });
+  playTone(1320, now + 0.035, 0.08, { type: "triangle", gain: 0.035, destination: sfxGain, attack: 0.003, release: 0.06 });
+}
+
+function playOpenSound() {
+  if (!audioStarted) return;
+  const now = audioCtx.currentTime;
+  playTone(523.25, now, 0.16, { type: "sine", gain: 0.075, destination: sfxGain, attack: 0.006, release: 0.13 });
+  playTone(1046.5, now + 0.075, 0.24, { type: "triangle", gain: 0.055, destination: sfxGain, attack: 0.01, release: 0.18 });
+  playNoise(now, 0.22, { gain: 0.035, low: 1100, high: 3600 });
+}
+
+function playCloseSound() {
+  if (!audioStarted) return;
+  const now = audioCtx.currentTime;
+  playTone(660, now, 0.08, { type: "sine", gain: 0.04, destination: sfxGain, attack: 0.004, release: 0.08 });
+  playTone(392, now + 0.035, 0.11, { type: "sine", gain: 0.035, destination: sfxGain, attack: 0.004, release: 0.1 });
+}
+
+function playFireworkLaunch() {
+  if (!audioStarted) return;
+  const now = audioCtx.currentTime;
+  playNoise(now, FIREWORK_ASCEND, { gain: 0.12, low: 180, high: 2200, sweep: true });
+  for (let i = 0; i < 5; i += 1) {
+    playTone(220 + i * 34, now + i * 0.08, 0.34, { type: "sawtooth", gain: 0.018, destination: sfxGain, attack: 0.04, release: 0.22 });
+  }
+}
+
+function playFireworkBurst() {
+  if (!audioStarted) return;
+  const now = audioCtx.currentTime;
+  playNoise(now, 1.2, { gain: 0.2, low: 70, high: 4200 });
+  [392, 523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+    playTone(freq, now + i * 0.018, 0.55 + i * 0.08, {
+      type: i % 2 ? "triangle" : "sine",
+      gain: 0.075 / (i + 1) ** 0.22,
+      destination: sfxGain,
+      attack: 0.004,
+      release: 0.52,
+    });
+  });
+}
+
+function playSparkle(scale = 1) {
+  if (!audioStarted) return;
+  const now = audioCtx.currentTime;
+  for (let i = 0; i < 8; i += 1) {
+    const t = now + i * 0.045;
+    const freq = 1046.5 * (1 + (i % 5) * 0.19);
+    playTone(freq, t, 0.16, { type: "sine", gain: 0.025 * scale, destination: sfxGain, attack: 0.002, release: 0.13 });
+  }
+}
+
+function playTone(freq, start, duration, options) {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  const destination = options.destination || sfxGain || audioCtx.destination;
+  const attack = options.attack ?? 0.01;
+  const release = options.release ?? 0.12;
+  osc.type = options.type || "sine";
+  osc.frequency.setValueAtTime(freq, start);
+  if (options.slideTo) osc.frequency.exponentialRampToValueAtTime(options.slideTo, start + duration);
+  gain.gain.setValueAtTime(0.0001, start);
+  gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, options.gain || 0.05), start + attack);
+  gain.gain.exponentialRampToValueAtTime(0.0001, start + Math.max(attack + 0.01, duration + release));
+  osc.connect(gain);
+  gain.connect(destination);
+  osc.start(start);
+  osc.stop(start + duration + release + 0.05);
+}
+
+function playNoise(start, duration, options = {}) {
+  if (!audioCtx) return;
+  const length = Math.max(1, Math.floor(audioCtx.sampleRate * duration));
+  const buffer = audioCtx.createBuffer(1, length, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < length; i += 1) data[i] = (Math.random() * 2 - 1) * (1 - i / length);
+  const source = audioCtx.createBufferSource();
+  const filter = audioCtx.createBiquadFilter();
+  const gain = audioCtx.createGain();
+  source.buffer = buffer;
+  filter.type = "bandpass";
+  filter.frequency.setValueAtTime(options.low || 160, start);
+  filter.Q.setValueAtTime(0.72, start);
+  if (options.sweep) filter.frequency.exponentialRampToValueAtTime(options.high || 2400, start + duration);
+  else filter.frequency.setValueAtTime(options.high || 1800, start + duration * 0.35);
+  gain.gain.setValueAtTime(0.0001, start);
+  gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, options.gain || 0.08), start + 0.04);
+  gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+  source.connect(filter);
+  filter.connect(gain);
+  gain.connect(sfxGain || audioCtx.destination);
+  source.start(start);
+  source.stop(start + duration + 0.03);
+}
+
+function noteFreq(note) {
+  const match = /^([A-G])(#?)(\d)$/.exec(note);
+  if (!match) return 440;
+  const semis = { C: -9, D: -7, E: -5, F: -4, G: -2, A: 0, B: 2 };
+  const octave = Number(match[3]);
+  const offset = semis[match[1]] + (match[2] ? 1 : 0) + (octave - 4) * 12;
+  return 440 * 2 ** (offset / 12);
 }
 
 function loadImage(src) {
